@@ -1,0 +1,47 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Observatory.gd" type="Script" id=1]
+[ext_resource path="res://default_env.tres" type="Environment" id=2]
+
+[sub_resource type="CubeMesh" id=1]
+
+[sub_resource type="StandardMaterial3D" id=2]
+
+[node name="Control" type="Control"]
+margin_right = 1024.0
+margin_bottom = 600.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Node3D" type="Node3D" parent="."]
+script = null
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Node3D"]
+transform = Transform( 0.415503, 0.477235, -0.774341, -6.34272e-09, 0.851306, 0.52467, 0.909592, -0.218002, 0.35372, -10.2905, 2.41485, -0.137984 )
+script = null
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D"]
+transform = Transform( 0.3, 1.49012e-09, 8.88179e-17, -2.23517e-09, 0.2, 0, -6.66134e-17, -3.30872e-25, 0.4, -1.02469, 0, -2.4261 )
+mesh = SubResource( 1 )
+material/0 = SubResource( 2 )
+script = null
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Node3D"]
+transform = Transform( 0.3, 1.49012e-09, 8.88179e-17, -2.23517e-09, 0.2, 0, -6.66134e-17, -3.30872e-25, 0.4, 0.198678, 0, -4.0317 )
+mesh = SubResource( 1 )
+material/0 = null
+script = null
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="Node3D"]
+transform = Transform( 0.3, 1.49012e-09, 8.88179e-17, -2.23517e-09, 0.2, 0, -6.66134e-17, -3.30872e-25, 0.4, 0.472809, 0, -1.97683 )
+mesh = SubResource( 1 )
+material/0 = null
+script = null
+
+[node name="Camera3D" type="Camera3D" parent="Node3D"]
+transform = Transform( 0.756227, -0.435248, 0.488549, 0.244923, 0.880681, 0.405481, -0.60674, -0.186979, 0.772597, 1.11011, 1.09104, -0.579003 )
+environment = ExtResource( 2 )
+fov = 86.6
+script = null

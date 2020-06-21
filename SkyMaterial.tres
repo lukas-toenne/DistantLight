@@ -1,0 +1,18 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=2]
+
+[ext_resource path="res://SkyShader.shader" type="Shader" id=1]
+
+[resource]
+shader = ExtResource( 1 )
+shader_param/sky_top_color = Color( 0.35, 0.46, 0.71, 1 )
+shader_param/sky_horizon_color = Color( 0.55, 0.69, 0.81, 1 )
+shader_param/sky_curve = 0.09
+shader_param/sky_energy = 1.0
+shader_param/ground_bottom_color = Color( 0.12, 0.12, 0.13, 1 )
+shader_param/ground_horizon_color = Color( 0.37, 0.33, 0.31, 1 )
+shader_param/ground_curve = 0.02
+shader_param/ground_energy = 1.0
+shader_param/sun_angle_max = 1.74
+shader_param/sun_curve = 0.05
+shader_param/resolution = Vector2( 2500, 1908 )
+shader_param/tan_fov = Vector2( -0.27588, -0.210552 )
