@@ -13,7 +13,8 @@ uniform float ground_energy = 1.0;
 uniform float sun_angle_max = 1.74;
 uniform float sun_curve : hint_range(0, 1) = 0.05;
 
-//uniform mat4 projection_matrix = mat4(0.0);
+uniform mat4 model_view_proj = mat4(0.0);
+uniform mat4 inv_model_view_proj = mat4(0.0);
 uniform vec2 resolution = vec2(1, 1);
 uniform vec2 tan_fov = vec2(1, 1);
 
@@ -25,6 +26,18 @@ void fragment() {
 	bool draw_overlays = !AT_HALF_RES_PASS && !AT_QUARTER_RES_PASS && !AT_CUBEMAP_PASS;
 	if (draw_overlays)
 	{
+		float phi = 2.0*PI * SKY_COORDS.x;
+		float theta = PI * SKY_COORDS.y;
+		vec3 sky_cart = vec3(sin(phi) * sin(theta), cos(theta), -cos(phi) * sin(theta));
+		
+//		vec3 axis_z = -EYEDIR;
+//		vec3 axis_x = normalize(cross(vec3(0, 1, 0), axis_z));
+//		vec3 axis_y = cross(axis_z, axis_x);
+//		mat3 view_to_world = mat3(axis_x, axis_y, axis_z);
+//		mat3 world_to_view = inverse(view_to_world);
+		
+		vec3 sky_local = (inv_model_view_proj * vec4(sky_cart, 0)).xyz;
+
 		int div = 36;
 		vec2 vdiv = vec2(float(div), float(div >> 1));
 		
@@ -46,6 +59,9 @@ void fragment() {
 		COLOR = vec3(offset.xy, 0);
 //		COLOR = vec3(resolution, 0);
 //		COLOR = projection_matrix[3].xyz;
+
+		COLOR = vec3(angle.xy, 0);
+		COLOR = model_view_proj[0].xyz;
 	}
 
 //	float v_angle = acos(clamp(EYEDIR.y, -1.0, 1.0));
