@@ -20,48 +20,60 @@ uniform vec2 tan_fov = vec2(1, 1);
 
 const float PI = 3.1415926535897932384626433833;
 
+vec2 cart_to_polar(vec3 cart)
+{
+	return vec2(-atan(cart.x, cart.z), acos(cart.y) / length(cart.xz));
+}
+
+vec3 polar_to_cart(vec2 polar)
+{
+	return vec3(sin(polar.x) * sin(polar.y), cos(polar.y), -cos(polar.x) * sin(polar.y));
+}
+
+vec2 polar_to_screen(vec2 polar)
+{
+	vec3 unitpos = polar_to_cart(polar);
+	vec3 screenpos = (inv_model_view_proj * vec4(unitpos, 0)).xyz;
+	return screenpos.xy * resolution / screenpos.z;
+}
+
+float stripes(float x, float width)
+{
+	return mod(x, width * 2.0) > width ? 1.0 : 0.0;
+}
+
+vec2 stripes2(vec2 v, float width)
+{
+	return vec2(stripes(v.x, width), stripes(v.y, width));
+}
+
+void draw_line(inout vec3 color, vec2 screenpos, vec2 closest_polar, float thickness, vec4 linecolor)
+{
+	vec2 closest_screenpos = polar_to_screen(closest_polar);
+	float dist = distance(screenpos, closest_screenpos);
+	
+	float f = 1.0 - smoothstep(thickness - 1.0, thickness + 1.0, dist);
+	color = mix(color, linecolor.xyz, linecolor.a * f);
+}
+
 void fragment() {
 	COLOR = vec3(0, 0, 0);
 
 	bool draw_overlays = !AT_HALF_RES_PASS && !AT_QUARTER_RES_PASS && !AT_CUBEMAP_PASS;
 	if (draw_overlays)
 	{
-		float phi = 2.0*PI * SKY_COORDS.x;
-		float theta = PI * SKY_COORDS.y;
-		vec3 sky_cart = vec3(sin(phi) * sin(theta), cos(theta), -cos(phi) * sin(theta));
-		
-//		vec3 axis_z = -EYEDIR;
-//		vec3 axis_x = normalize(cross(vec3(0, 1, 0), axis_z));
-//		vec3 axis_y = cross(axis_z, axis_x);
-//		mat3 view_to_world = mat3(axis_x, axis_y, axis_z);
-//		mat3 world_to_view = inverse(view_to_world);
-		
-		vec3 sky_local = (inv_model_view_proj * vec4(sky_cart, 0)).xyz;
+		vec2 sky_polar = vec2(2.0*PI * SKY_COORDS.x, PI * SKY_COORDS.y);
+		vec2 sky_screen = polar_to_screen(sky_polar);
 
 		int div = 36;
 		vec2 vdiv = vec2(float(div), float(div >> 1));
-		
 		vec2 cellsize = vec2(2.0*PI, PI) / vdiv;
+
 		vec2 cell = SKY_COORDS * vdiv;
 		vec2 celldist = fract(cell + vec2(0.5, 0.5)) - vec2(0.5, 0.5);
 
-		vec2 angle = celldist * cellsize;
-//		float min_angle = min(abs(angle.y), abs(angle.x));
-		
-		vec2 pixeldist = tan(angle) / tan_fov;
-
-		float min_dist = min(abs(pixeldist.y), abs(pixeldist.x));
-		float value = smoothstep(0.01, 0.0, min_dist);
-		
-		COLOR.rg = vec2(1, 1) * value;
-		
-		vec2 offset = atan((SCREEN_UV.xy * 2.0 - vec2(1.0, 1.0)) * tan_fov);
-		COLOR = vec3(offset.xy, 0);
-//		COLOR = vec3(resolution, 0);
-//		COLOR = projection_matrix[3].xyz;
-
-		COLOR = vec3(angle.xy, 0);
-		COLOR = model_view_proj[0].xyz;
+		draw_line(COLOR, sky_screen, sky_polar - vec2(celldist.x, 0.0) * cellsize, 2.0, vec4(1.0, 0.0, 1.0, 1.0));
+		draw_line(COLOR, sky_screen, sky_polar - vec2(0.0, celldist.y) * cellsize, 2.0, vec4(1.0, 0.0, 1.0, 1.0));
 	}
 
 //	float v_angle = acos(clamp(EYEDIR.y, -1.0, 1.0));
